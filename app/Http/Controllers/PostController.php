@@ -3,9 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\PostRequest;
+use App\Post;
+use Auth;
+
 
 class PostController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -13,7 +21,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        return view('posts.index');
+        $posts = Post::all();
+        return view('posts.index', compact('posts'));
     }
 
     /**
@@ -23,7 +32,7 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create');
     }
 
     /**
@@ -32,9 +41,17 @@ class PostController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PostRequest $request)
     {
-        //
+        $post = new Post; //インスタンスを作成
+
+        $post -> title    = $request -> title; //ユーザー入力のtitleを代入
+        $post -> body     = $request -> body; //ユーザー入力のbodyを代入
+        $post -> user_id  = Auth::id(); //ログイン中のユーザーidを代入
+
+        $post -> save(); //保存してあげましょう
+        
+        return redirect()->route('posts.index');
     }
 
     /**
